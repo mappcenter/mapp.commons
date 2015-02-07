@@ -7,6 +7,7 @@
 package files;
 
 import commonUtils.CommonUtils;
+import static commonUtils.CommonUtils.IsNullOrEmpty;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -78,6 +80,31 @@ public class FileUtils {
                 return true;
             }
         }catch (IOException ex){
+            return false;
+        }
+        return false;
+    }
+    
+    public static boolean WriteDatFile(String pathFileText, String fileContent) {
+        try {
+            File file = new File(pathFileText);
+
+            //if file doesnt exists, then create it
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            //Collecting Data
+            if(!IsNullOrEmpty(fileContent)){
+                //true = append file
+                FileWriter fileWritter = new FileWriter(file.getPath(), true);
+                BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
+                bufferWritter.write(fileContent);
+                bufferWritter.close();
+                
+                return true;
+            }
+        }catch (Exception ex){
             return false;
         }
         return false;

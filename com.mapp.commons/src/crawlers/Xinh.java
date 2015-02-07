@@ -54,8 +54,6 @@ public class Xinh {
                 isLoad = saveImageByUrl(urlHome, "Xinh,XHome");
             }
             
-            
-            
             //Get All Category
             JsonObject jsonObjCategory = readJsonObjectFromUrl(linkXinhCategory);
             if (jsonObjCategory != null) {
@@ -119,6 +117,7 @@ public class Xinh {
         }
         return isMore;
     }
+    
     private static HashMap<String, JsonArray> readMapJsonFromUrl(List<String> listUrl) throws IOException {
         String listURLString = StringUtils.join(listUrl, ",");
         InputStream is = new URL("https://graph.facebook.com/comments/?ids=" + listURLString).openStream();
