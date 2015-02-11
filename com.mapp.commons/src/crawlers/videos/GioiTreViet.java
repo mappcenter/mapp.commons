@@ -24,7 +24,7 @@ import org.jsoup.select.Elements;
  * @author liempt
  */
 public class GioiTreViet {
-    private static final Logger logger = LogUtil.getLogger(XemHaiTV.class);
+    private static final Logger logger = LogUtil.getLogger(GioiTreViet.class);
     
     public static void main(String[] args) {        
         String urlX = "http://gioitreviet.net/video/page/%s/";
@@ -44,6 +44,7 @@ public class GioiTreViet {
                 }
             }
         } catch (Exception e) {
+            logger.error(LogUtil.stackTrace(e));
         }
         
     }
@@ -78,6 +79,7 @@ public class GioiTreViet {
                 return listResult;
             }
         } catch (Exception e) {
+            logger.error(LogUtil.stackTrace(e));
             return null;
         }
         return null;

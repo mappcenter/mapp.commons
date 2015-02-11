@@ -21,7 +21,7 @@ import org.jsoup.select.Elements;
  * @author MrFlex
  */
 public class ChatVL {
-    private static final Logger logger = LogUtil.getLogger(XemHaiTV.class);
+    private static final Logger logger = LogUtil.getLogger(ChatVL.class);
     
     public static void main(String[] args) {        
         String urlX = "http://chatvl.com/hot/%s";
@@ -41,6 +41,7 @@ public class ChatVL {
                 }
             }
         } catch (Exception e) {
+            logger.error(LogUtil.stackTrace(e));
         }
         
     }
@@ -75,6 +76,7 @@ public class ChatVL {
                 return listResult;
             }
         } catch (Exception e) {
+            logger.error(LogUtil.stackTrace(e));
             return null;
         }
         return null;
