@@ -9,6 +9,7 @@ import com.nct.framework.common.LogUtil;
 import com.nct.framework.util.JSONUtil;
 import commonUtils.CommonUtils;
 import entities.crawlEnt.VideoLinkEnt;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -24,6 +25,7 @@ import org.jsoup.select.Elements;
  */
 public class KenhTin360 {
     private static final Logger logger = LogUtil.getLogger(KenhTin360.class);
+    private static final String filePath = "/home/liempt/Desktop/KenhTin360.txt";
     
     public static void main(String[] args) {        
         String urlCrawl = "http://kenhtin360.com/category/video/page/%s/";
@@ -40,7 +42,15 @@ public class KenhTin360 {
                             dateFiles += xVideo.Link+"--"+xVideo.Title+"\n";
                         }
                     }
-                    files.FileUtils.WriteDatFile("/home/liempt/Desktop/KenhTin360.txt", dateFiles);
+                    
+                    //Write to Files
+                    File file = new File(filePath); 
+                    if(file.delete()){
+                            System.out.println(file.getName() + " is deleted!");
+                    }else{
+                            System.out.println("Delete operation is failed.");
+                    }
+                    files.FileUtils.WriteDatFile(filePath, dateFiles);
                     System.out.println("Id:"+i+" => "+JSONUtil.Serialize(tmpVideoLinkEnt));
                 }
             }
