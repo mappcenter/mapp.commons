@@ -10,5 +10,6 @@ package crawlers.videos;
  * @author MrFlex
  */
 public class VuiVideo_Com {
-    
+    String urlTemplate = "http://vuivideo.com/video-hai/page/2";
+    String listCategory = "fail-prank|video-hai|nhac|quang-cao|cute|phim|the-thao|tin-tuc|game|video-hot";
 }
