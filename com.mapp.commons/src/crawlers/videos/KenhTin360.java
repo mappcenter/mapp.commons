@@ -31,29 +31,31 @@ public class KenhTin360 {
         String urlCrawl = "http://kenhtin360.com/category/video/page/%s/";
             
         try {
+            String dateFiles = "";
             for(int i=1;i<50;i++){
                 String tmpX = String.format(urlCrawl, i);
                 List<VideoLinkEnt> tmpVideoLinkEnt = getListVideoLinkEnt(tmpX);
                 if(tmpVideoLinkEnt!=null){
 //                    CreateVideoLinks(tmpVideoLinkEnt);
-                    String dateFiles = "";
+                    
                     for(VideoLinkEnt xVideo : tmpVideoLinkEnt){
                         if(xVideo!=null){
                             dateFiles += xVideo.Link+"--"+xVideo.Title+"\n";
                         }
                     }
                     
-                    //Write to Files
-                    File file = new File(filePath); 
-                    if(file.delete()){
-                            System.out.println(file.getName() + " is deleted!");
-                    }else{
-                            System.out.println("Delete operation is failed.");
-                    }
-                    files.FileUtils.WriteDatFile(filePath, dateFiles);
+                    
                     System.out.println("Id:"+i+" => "+JSONUtil.Serialize(tmpVideoLinkEnt));
                 }
             }
+            //Write to Files
+            File file = new File(filePath); 
+            if(file.delete()){
+                    System.out.println(file.getName() + " is deleted!");
+            }else{
+                    System.out.println("Delete operation is failed.");
+            }
+            files.FileUtils.WriteDatFile(filePath, dateFiles);
         } catch (Exception e) {
             logger.error(LogUtil.stackTrace(e));
         }

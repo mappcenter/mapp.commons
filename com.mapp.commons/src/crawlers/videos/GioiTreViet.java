@@ -7,10 +7,7 @@ package crawlers.videos;
 
 import com.nct.framework.common.LogUtil;
 import com.nct.framework.util.JSONUtil;
-import commonUtils.CommonUtils;
-import static databaseUtils.DatabaseServiceUtils.CreateVideoLinks;
 import entities.crawlEnt.VideoLinkEnt;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
