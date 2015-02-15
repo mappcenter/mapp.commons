@@ -8,6 +8,7 @@ package crawlers.videos;
 import com.nct.framework.common.LogUtil;
 import com.nct.framework.util.JSONUtil;
 import entities.crawlEnt.VideoLinkEnt;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -22,17 +23,17 @@ import org.jsoup.select.Elements;
  */
 public class GioiTreViet {
     private static final Logger logger = LogUtil.getLogger(GioiTreViet.class);
+    private static final String filePath = "/home/liempt/Desktop/gioitreviet.txt";
     
     public static void main(String[] args) {        
         String urlX = "http://gioitreviet.net/video/page/%s/";
             
         try {
+            String dateFiles = "";
             for(int i=0;i<50;i++){
                 String tmpX = String.format(urlX, i);
                 List<VideoLinkEnt> tmpVideoLinkEnt = getVideoLinkEnt(tmpX);
                 if(tmpVideoLinkEnt!=null){
-//                    CreateVideoLinks(tmpVideoLinkEnt);
-                    String dateFiles = "";
                     for(VideoLinkEnt xVideo : tmpVideoLinkEnt){
                         dateFiles += xVideo.Link+"--"+xVideo.Title+"\n";
                     }
@@ -40,6 +41,14 @@ public class GioiTreViet {
                     System.out.println("Id:"+i+" => "+JSONUtil.Serialize(tmpVideoLinkEnt));
                 }
             }
+            //Write to Files
+            File file = new File(filePath); 
+            if(file.delete()){
+                    System.out.println(file.getName() + " is deleted!");
+            }else{
+                    System.out.println("Delete operation is failed.");
+            }
+            files.FileUtils.WriteDatFile(filePath, dateFiles);
         } catch (Exception e) {
             logger.error(LogUtil.stackTrace(e));
         }
