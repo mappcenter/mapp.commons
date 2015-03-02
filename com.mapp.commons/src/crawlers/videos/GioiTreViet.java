@@ -5,7 +5,9 @@
  */
 package crawlers.videos;
 
+import com.nct.framework.common.Config;
 import com.nct.framework.common.LogUtil;
+import com.nct.framework.util.ConvertUtils;
 import com.nct.framework.util.JSONUtil;
 import entities.crawlEnt.VideoLinkEnt;
 import java.io.File;
@@ -22,8 +24,10 @@ import org.jsoup.select.Elements;
  * @author liempt
  */
 public class GioiTreViet {
+    private static final String configName = "main_settings";
+    private static final String SAVE_FOLDER = ConvertUtils.toString(Config.getParam(configName, "folder"), "");
     private static final Logger logger = LogUtil.getLogger(GioiTreViet.class);
-    private static final String filePath = "/home/liempt/Desktop/gioitreviet.txt";
+    private static final String filePath = SAVE_FOLDER + "gioitreviet.txt";
     
     public static void main(String[] args) {        
         String urlX = "http://gioitreviet.net/video/page/%s/";

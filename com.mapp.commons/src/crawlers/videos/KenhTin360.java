@@ -32,7 +32,7 @@ public class KenhTin360 {
             
         try {
             String dateFiles = "";
-            for(int i=1;i<50;i++){
+            for(int i=1;i<90;i++){
                 String tmpX = String.format(urlCrawl, i);
                 List<VideoLinkEnt> tmpVideoLinkEnt = getListVideoLinkEnt(tmpX);
                 if(tmpVideoLinkEnt!=null){
