@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  *
  * @author liempt
  */
-public class TinTucGioiTreViet_Com {
-    private static final Logger logger = LogUtil.getLogger(TinTucGioiTreViet_Com.class);
-    private static final String filePath = "/home/liempt/Desktop/TinTucGioiTreViet_Com.txt";
+public class XemGame_Com {
+    private static final Logger logger = LogUtil.getLogger(XemGame_Com.class);
+    private static final String filePath = "/home/liempt/Desktop/XemGame_Com.txt";
     
     public static void main(String[] args) {        
-        String urlX = "http://tintucgioitreviet.com/category/video/page/%s/";
+        String urlX = "http://www.xemgame.com/video";
             
         try {
             String dateFiles = "";

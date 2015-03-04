@@ -13,16 +13,17 @@ import org.apache.log4j.Logger;
  *
  * @author liempt
  */
-public class TinTucGioiTreViet_Com {
-    private static final Logger logger = LogUtil.getLogger(TinTucGioiTreViet_Com.class);
-    private static final String filePath = "/home/liempt/Desktop/TinTucGioiTreViet_Com.txt";
+public class BlogTamSu_Vn {
+    private static final Logger logger = LogUtil.getLogger(BlogTamSu_Vn.class);
+    private static final String filePath = "/home/liempt/Desktop/BlogTamSu_Vn.txt";
+    
     
     public static void main(String[] args) {        
-        String urlX = "http://tintucgioitreviet.com/category/video/page/%s/";
+        String urlX = "http://blogtamsu.vn/video-2014/page/%s";
             
         try {
             String dateFiles = "";
-            for(int i=1;i<300;i++){
+            for(int i=1;i<20;i++){
                 String tmpX = String.format(urlX, i);
 //                List<VideoLinkEnt> tmpVideoLinkEnt = getVideoLinkEnt(tmpX);
 //                if(tmpVideoLinkEnt!=null){
@@ -47,4 +48,5 @@ public class TinTucGioiTreViet_Com {
         }
         
     }
+    
 }
