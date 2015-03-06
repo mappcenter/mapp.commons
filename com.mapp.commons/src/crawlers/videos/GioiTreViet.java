@@ -27,7 +27,7 @@ public class GioiTreViet {
     private static final String configName = "main_settings";
     private static final String SAVE_FOLDER = ConvertUtils.toString(Config.getParam(configName, "folder"), "");
     private static final Logger logger = LogUtil.getLogger(GioiTreViet.class);
-    private static final String filePath = SAVE_FOLDER + "gioitreviet.txt";
+    private static final String filePath = SAVE_FOLDER + "GioiTreViet.txt";
     
     public static void main(String[] args) {        
         String urlX = "http://gioitreviet.net/video/page/%s/";
@@ -41,7 +41,6 @@ public class GioiTreViet {
                     for(VideoLinkEnt xVideo : tmpVideoLinkEnt){
                         dateFiles += xVideo.Link+"--"+xVideo.Title+"\n";
                     }
-                    files.FileUtils.WriteDatFile("/home/liempt/Desktop/gioitreviet.txt", dateFiles);
                     System.out.println("Id:"+i+" => "+JSONUtil.Serialize(tmpVideoLinkEnt));
                 }
             }

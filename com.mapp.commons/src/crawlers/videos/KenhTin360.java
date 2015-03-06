@@ -5,7 +5,9 @@
  */
 package crawlers.videos;
 
+import com.nct.framework.common.Config;
 import com.nct.framework.common.LogUtil;
+import com.nct.framework.util.ConvertUtils;
 import com.nct.framework.util.JSONUtil;
 import commonUtils.CommonUtils;
 import entities.crawlEnt.VideoLinkEnt;
@@ -24,15 +26,17 @@ import org.jsoup.select.Elements;
  * @author liempt
  */
 public class KenhTin360 {
+    private static final String configName = "main_settings";
+    private static final String SAVE_FOLDER = ConvertUtils.toString(Config.getParam(configName, "folder"), "");
     private static final Logger logger = LogUtil.getLogger(KenhTin360.class);
-    private static final String filePath = "/home/liempt/Desktop/KenhTin360.txt";
+    private static final String filePath = SAVE_FOLDER + "KenhTin360.txt";
     
     public static void main(String[] args) {        
         String urlCrawl = "http://kenhtin360.com/category/video/page/%s/";
             
         try {
             String dateFiles = "";
-            for(int i=1;i<90;i++){
+            for(int i=1;i<50;i++){
                 String tmpX = String.format(urlCrawl, i);
                 List<VideoLinkEnt> tmpVideoLinkEnt = getListVideoLinkEnt(tmpX);
                 if(tmpVideoLinkEnt!=null){

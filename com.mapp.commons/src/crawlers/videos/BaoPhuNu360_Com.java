@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package crawlers.videos;
 
 import com.nct.framework.common.Config;
@@ -21,49 +16,43 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 /**
  *
  * @author liempt
  */
-public class Hai24h_TV { 
+public class BaoPhuNu360_Com {
     private static final String configName = "main_settings";
     private static final String SAVE_FOLDER = ConvertUtils.toString(Config.getParam(configName, "folder"), "");
-    private static final Logger logger = LogUtil.getLogger(Hai24h_TV.class);
-    private static final String filePath = SAVE_FOLDER + "Hai24h_TV.txt";
+    private static final Logger logger = LogUtil.getLogger(BaoPhuNu360_Com.class);
+    private static final String filePath = SAVE_FOLDER + "BaoPhuNu360_Com.txt";
     
     public static void main(String[] args) {        
-        String urlHot = "http://hai24h.tv/categories/video-hot/page/%s/";
-        String urlNew = "http://hai24h.tv/categories/video-moi-2/page/%s/";
+        String urlCrawl = "http://baophunu360.com/category/video/page/%s/";
             
         try {
             String dateFiles = "";
-            //For HOT
-            for(int i=1;i<10;i++){
-                String tmpX = String.format(urlHot, i);
+            for(int i=1;i<50;i++){
+                String tmpX = String.format(urlCrawl, i);
                 List<VideoLinkEnt> tmpVideoLinkEnt = getListVideoLinkEnt(tmpX);
                 if(tmpVideoLinkEnt!=null){
+//                    CreateVideoLinks(tmpVideoLinkEnt);
+                    
                     for(VideoLinkEnt xVideo : tmpVideoLinkEnt){
                         if(xVideo!=null){
                             dateFiles += xVideo.Link+"--"+xVideo.Title+"\n";
                         }
                     }
+                    
+                    
                     System.out.println("Id:"+i+" => "+JSONUtil.Serialize(tmpVideoLinkEnt));
                 }
             }
-            //For New
-            for(int i=1;i<10;i++){
-                String tmpX = String.format(urlNew, i);
-                List<VideoLinkEnt> tmpVideoLinkEnt = getListVideoLinkEnt(tmpX);
-                if(tmpVideoLinkEnt!=null){
-                    for(VideoLinkEnt xVideo : tmpVideoLinkEnt){
-                        if(xVideo!=null){
-                            dateFiles += xVideo.Link+"--"+xVideo.Title+"\n";
-                        }
-                    }
-                    System.out.println("Id:"+i+" => "+JSONUtil.Serialize(tmpVideoLinkEnt));
-                }
-            }
-            
             //Write to Files
             File file = new File(filePath); 
             if(file.delete()){
@@ -78,8 +67,7 @@ public class Hai24h_TV {
         
     }
     
-    
-     public static List<VideoLinkEnt> getListVideoLinkEnt(String videoLink) {
+    public static List<VideoLinkEnt> getListVideoLinkEnt(String videoLink) {
         try {
             List<VideoLinkEnt> listResult = new ArrayList<VideoLinkEnt>();
             Connection.Response response = Jsoup.connect(videoLink)
@@ -98,9 +86,15 @@ public class Hai24h_TV {
                             .get();
 
 
-                Elements elementVideo = doc.select("div.item-img");
-                if(elementVideo!=null&&elementVideo.size()>0){
-                    for(Element tmpVideoLink : elementVideo){
+                Element tmpYoutubeTOP = doc.select("div.big_news_folder").select("a").first();
+                if(tmpYoutubeTOP!=null){
+                    String tmpLink = tmpYoutubeTOP.attr("href");
+                    VideoLinkEnt tmpVideoLinkEnt = getVideoLinkEnt(tmpLink);
+                    listResult.add(tmpVideoLinkEnt);
+                }
+                Elements elementGenres = doc.select("ul.ul_folder").select("li");
+                if(elementGenres!=null&&elementGenres.size()>0){
+                    for(Element tmpVideoLink : elementGenres){
                         Element tmpYoutube = tmpVideoLink.select("a").first();
                         if(tmpYoutube!=null){
                             String tmpLink = tmpYoutube.attr("href");
@@ -122,6 +116,7 @@ public class Hai24h_TV {
     
     public static VideoLinkEnt getVideoLinkEnt(String videoLink) {
         try {
+//            System.out.println(videoLink);
             VideoLinkEnt result = new VideoLinkEnt();
             Document doc = Jsoup.connect(videoLink)
                         .userAgent("Mozilla/5.0 (Windows NT 6.1; rv:14.0) Gecko/20100101 Firefox/14.0.1")
@@ -129,17 +124,17 @@ public class Hai24h_TV {
                         .timeout(600000)
                         .get();
             
-            String tmpLink = doc.select("iframe").attr("src");
-            if(!commonUtils.CommonUtils.IsNullOrEmpty(tmpLink)){
-                tmpLink = tmpLink.split("https://www.youtube.com/embed/")[1];
-                if(!CommonUtils.IsNullOrEmpty(tmpLink)){
-                    tmpLink = tmpLink.split("\\?")[0];
+            String tmpScript = doc.select("div.remain_detail").select("script").first().html();
+            if(!commonUtils.CommonUtils.IsNullOrEmpty(tmpScript)&&tmpScript.contains("file:\'")){
+//                System.out.println(tmpScript);
+                tmpScript = tmpScript.split("file:\'")[1];
+                if(!CommonUtils.IsNullOrEmpty(tmpScript)){
+                    tmpScript = tmpScript.split("\'")[0];
                 }
-                
-                result.Link = tmpLink;
+                result.Link = tmpScript.replace("https://www.youtube.com/watch?v=", "");
                 result.Source = videoLink;
                 result.Status = 0;
-                result.Title = doc.select("div.video-info").select("h1").text();
+                result.Title = doc.select("div.header_detail").select("h2.title_detail").text();
                 
                 return result;
             }
