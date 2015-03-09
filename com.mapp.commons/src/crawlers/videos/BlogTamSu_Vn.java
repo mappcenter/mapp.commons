@@ -5,7 +5,9 @@
  */
 package crawlers.videos;
 
+import com.nct.framework.common.Config;
 import com.nct.framework.common.LogUtil;
+import com.nct.framework.util.ConvertUtils;
 import java.io.File;
 import org.apache.log4j.Logger;
 
@@ -14,8 +16,10 @@ import org.apache.log4j.Logger;
  * @author liempt
  */
 public class BlogTamSu_Vn {
+    private static final String configName = "main_settings";
+    private static final String SAVE_FOLDER = ConvertUtils.toString(Config.getParam(configName, "folder"), "");
     private static final Logger logger = LogUtil.getLogger(BlogTamSu_Vn.class);
-    private static final String filePath = "/home/liempt/Desktop/BlogTamSu_Vn.txt";
+    private static final String filePath = SAVE_FOLDER + "BlogTamSu_Vn.txt";
     
     
     public static void main(String[] args) {        
