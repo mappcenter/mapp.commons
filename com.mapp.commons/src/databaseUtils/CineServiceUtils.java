@@ -8,6 +8,8 @@ package databaseUtils;
 import com.nct.framework.common.LogUtil;
 import com.nct.framework.dbconn.ClientManager;
 import com.nct.framework.dbconn.ManagerIF;
+import com.nct.framework.util.ConvertUtils;
+import entities.CategoryEnt;
 import entities.DB.CineChannelEnt;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,8 +31,21 @@ public class CineServiceUtils {
         ManagerIF cm = ClientManager.getInstance("hdbox_server_db");
         Connection cnn = cm.borrowClient();
         try {
-            String query = "INSERT INTO `Cine_Channel` (`Name`, `Image`, `Cover`, `Categories`, `Description`, `Country`, `Time`, `Tags`, `ArtistIds`, `Status`)"
-                    + " VALUE (?,?,?,?,?,?,?,?,?,?);";
+            String queryCheck = "SELECT `Id` FROM `Cine_Channel` WHERE `Source`=?;";
+            PreparedStatement stmtCheck = cnn.prepareStatement(queryCheck);
+            stmtCheck.setString(1, channelEnt.Source);
+            ResultSet resultSet = stmtCheck.executeQuery();
+            if(resultSet.next()){
+                long tmpId = ConvertUtils.toLong(resultSet.getString("Id"));
+                if(tmpId>0){
+                    return tmpId;
+                }
+            }
+            resultSet.close();
+            stmtCheck.close();
+            
+            String query = "INSERT INTO `Cine_Channel` (`Name`, `Image`, `Cover`, `Categories`, `Description`, `Country`, `Time`, `Tags`, `ArtistIds`, `Status`, `Source`)"
+                    + " VALUE (?,?,?,?,?,?,?,?,?,?,?);";
             
             PreparedStatement stmt = cnn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, channelEnt.Name);
@@ -43,6 +58,7 @@ public class CineServiceUtils {
             stmt.setString(8, StringUtils.join(channelEnt.Tags, ","));
             stmt.setString(9, StringUtils.join(channelEnt.ArtistIds, ","));
             stmt.setInt(10, channelEnt.Status);
+            stmt.setString(11, channelEnt.Source);
             
             int result = stmt.executeUpdate();
             if(result>0){
@@ -60,4 +76,60 @@ public class CineServiceUtils {
         
         return idReturn;
     }
+    
+    
+    public static long CheckExistName(String categoryName) {
+        long categoryReturn = 0L;
+        ManagerIF cm = ClientManager.getInstance("hdbox_server_db");
+        Connection cnn = cm.borrowClient();
+     
+        try {
+            String query = "SELECT * FROM `Cine_Category` WHERE `Name` = ? ;";
+            PreparedStatement stmt = cnn.prepareStatement(query);
+            stmt.setString(1, categoryName);
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                long tmpId = ConvertUtils.toLong(resultSet.getString("Id"));
+                if (tmpId > 0L)
+                    categoryReturn = tmpId;
+            }
+        }catch (SQLException ex) {
+            logger.error(LogUtil.stackTrace(ex));
+        } finally {
+            cm.returnClient(cnn);
+        }
+        return categoryReturn;
+    }
+
+
+
+
+    public static long CreateCategory(CategoryEnt categoryEnt) {
+        long categoryReturn = 0L;
+        ManagerIF cm = ClientManager.getInstance("hdbox_server_db");
+        Connection cnn = cm.borrowClient();
+        try {
+            String query = "INSERT INTO `Cine_Category` (`Name`, `Parent`, `Tree`, `Module`) VALUE(?,?,?,?) ;";
+            PreparedStatement stmt = cnn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            stmt.setString(1, categoryEnt.Name);
+            stmt.setLong(2, categoryEnt.Parent);
+            stmt.setString(3, categoryEnt.Tree);
+            stmt.setString(4, categoryEnt.Module);
+
+            int result = stmt.executeUpdate();
+            if (result > 0) {
+                ResultSet generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next())
+                    categoryReturn = generatedKeys.getLong(1);
+            }
+        }catch (SQLException ex){
+            logger.error(LogUtil.stackTrace(ex));
+        } finally {
+            cm.returnClient(cnn);
+        }
+        return categoryReturn;
+  }
+
+
+
 }

@@ -9,6 +9,7 @@ import entities.crawlEnt.ZingTVShowEnt;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringEscapeUtils;
+import serviceUtils.CategoryServiceUtils;
 
 /**
  *
@@ -26,6 +27,7 @@ public class CineChannelEnt {
     public List<String> Tags;
     public List<Long> ArtistIds;
     public int Status;
+    public String Source;
     
     public class STATUS {
         public static final int ENABLE = 1;
@@ -33,7 +35,7 @@ public class CineChannelEnt {
         public static final int DELETED = 3;
     }
     
-    public CineChannelEnt(ZingTVShowEnt zingTVShowEnt) {
+    public CineChannelEnt(ZingTVShowEnt zingTVShowEnt, long parentId, String parentName) {
         if(zingTVShowEnt!=null){            
             this.Id = 0;
             this.Name = StringEscapeUtils.unescapeHtml(zingTVShowEnt.Title);
@@ -42,15 +44,16 @@ public class CineChannelEnt {
             this.Description = StringEscapeUtils.unescapeHtml(zingTVShowEnt.Description);
             this.Country = StringEscapeUtils.unescapeHtml(zingTVShowEnt.QuocGia);
             this.Time = "";
-//            this.Categories = zingTVShowEnt.Genres;
-            this.Categories = new ArrayList<Long>();
-            this.Categories.add(1L);
+            this.Categories = CategoryServiceUtils.getListCategoryIds(zingTVShowEnt.Genres, "HDBox", parentId, parentName);
             
             this.Tags = zingTVShowEnt.Tags;
 //            this.ArtistIds = zingTVShowEnt.Artist;
             this.ArtistIds = new ArrayList<Long>();
             this.ArtistIds.add(5L);
             this.Status = CineChannelEnt.STATUS.ENABLE;
+            this.Source = zingTVShowEnt.Source;
         }
     }
+    
+ 
 }

@@ -27,8 +27,10 @@ public class ZingTV {
     
     public static void main(String[] args) {  
 //        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Viet-Nam/IWZ9ZII7.html?sort=new&p=%s";
-//        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Thuc-Te/IWZ9ZIIU.html?sort=new&p=%s";
-        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Au-My/IWZ9ZII9.html?sort=new&p=%s";
+//        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Au-My/IWZ9ZII9.html?sort=new&p=%s";
+        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Thuc-Te/IWZ9ZIIU.html?sort=new&p=%s";
+        long categoryParentId = 3;
+        String categoryParentName = "TV Show";
         for(int i=1;i<12;i++){
             String tmpX = String.format(urlTemplateShow, i);
             List<String> listLinkShow = getListLinkShow(tmpX);
@@ -36,7 +38,7 @@ public class ZingTV {
                 for(String tmpLinkShow : listLinkShow){
                     ZingTVShowEnt tmpVideoLinkEnt = getZingTVShowEnt(tmpLinkShow);
                     if(tmpVideoLinkEnt!=null){
-                        CineChannelEnt tmpChannelEnt = new CineChannelEnt(tmpVideoLinkEnt);
+                        CineChannelEnt tmpChannelEnt = new CineChannelEnt(tmpVideoLinkEnt, categoryParentId, categoryParentName);
                         long tmpId = CineServiceUtils.CreateCineChanel(tmpChannelEnt);
                         System.out.println("Id: "+ tmpId + " | " + tmpLinkShow);
                     }
