@@ -9,6 +9,8 @@ import com.nct.framework.util.JSONUtil;
 import commonUtils.CommonUtils;
 import databaseUtils.CineServiceUtils;
 import entities.DB.CineChannelEnt;
+import entities.SeasonEnt;
+import entities.VideoEnt;
 import entities.crawlEnt.ZingTVShowEnt;
 import entities.crawlEnt.ZingTVVideoEnt;
 import java.util.ArrayList;
@@ -25,7 +27,13 @@ import org.jsoup.select.Elements;
  */
 public class ZingTV {
     
-    public static void main(String[] args) {  
+    public static void main(String[] args) { 
+        
+        List<SeasonEnt> lstSeason = getListSeasonEnt(125, "http://tv.zing.vn/ngoi-sao-viet-2014");
+        System.out.println(JSONUtil.Serialize(lstSeason));
+        
+        
+        
 //        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Viet-Nam/IWZ9ZII7.html?sort=new&p=%s";
 //        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Au-My/IWZ9ZII9.html?sort=new&p=%s";
         String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Thuc-Te/IWZ9ZIIU.html?sort=new&p=%s";
@@ -192,4 +200,44 @@ public class ZingTV {
         return null;
     }
             
+    public static List<SeasonEnt> getListSeasonEnt(long channelId, String showPageLink) {
+        List<SeasonEnt> listReturn = new ArrayList<SeasonEnt>();
+        try {
+            Document doc = Jsoup.connect(showPageLink)
+                        .userAgent("Mozilla/5.0 (Windows NT 6.1; rv:14.0) Gecko/20100101 Firefox/14.0.1")
+                        .header("charset", "UTF-8")
+                        .timeout(600000)
+                        .get();
+            Elements elementSeason = doc.select("div.row126");
+            if(elementSeason!=null&&elementSeason.size()>0){
+                for(Element tmpSeason : elementSeason){
+                    SeasonEnt tmpSeasonEnt = new SeasonEnt();
+                    tmpSeasonEnt.ChannelId = channelId;
+                    tmpSeasonEnt.Name = tmpSeason.select("div.title-bar").select("h3>a").text();
+                    tmpSeasonEnt.Source = "http://tv.zing.vn"+tmpSeason.select("div.title-bar").select("h3>a").attr("href");
+                    tmpSeasonEnt.Status = 0;
+                    
+                    Elements elementVideo = tmpSeason.select("div.flex-des");
+                    if(elementVideo!=null&&elementVideo.size()>0){
+                        tmpSeasonEnt.ListVideos = new ArrayList<VideoEnt>();
+                        for(Element tmpVideo : elementVideo){
+                            VideoEnt tmpVideoEnt = new VideoEnt();
+                            tmpVideoEnt.Image = tmpVideo.select("img").attr("_src");
+                            tmpVideoEnt.SeasonId = 0;
+                            tmpVideoEnt.Source = "http://tv.zing.vn"+tmpVideo.select("a").first().attr("href");;
+                            tmpVideoEnt.Status = 0;
+                            tmpVideoEnt.Title = tmpVideo.select("img").attr("alt");
+                            
+                            tmpSeasonEnt.ListVideos.add(tmpVideoEnt);
+                        }
+                    }
+                    listReturn.add(tmpSeasonEnt);
+                }
+                return listReturn;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return null;
+    }
 }
