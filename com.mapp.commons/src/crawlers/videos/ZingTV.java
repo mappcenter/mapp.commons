@@ -7,13 +7,13 @@ package crawlers.videos;
 
 import com.nct.framework.util.JSONUtil;
 import commonUtils.CommonUtils;
-import static crawlers.videos.XemHaiTV.getVideoLinkEnt;
-import entities.crawlEnt.VideoLinkEnt;
+import databaseUtils.CineServiceUtils;
+import entities.DB.CineChannelEnt;
 import entities.crawlEnt.ZingTVShowEnt;
 import entities.crawlEnt.ZingTVVideoEnt;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -25,23 +25,67 @@ import org.jsoup.select.Elements;
  */
 public class ZingTV {
     
-    public static void main(String[] args) {        
-        String urlShow = "http://tv.zing.vn/the-100-season-2";
-        ZingTVShowEnt tmpVideoLinkEnt = getZingTVShowEnt(urlShow);
-        if(tmpVideoLinkEnt!=null){
-            System.out.println("URL:"+urlShow+" => "+JSONUtil.Serialize(tmpVideoLinkEnt));
+    public static void main(String[] args) {  
+//        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Viet-Nam/IWZ9ZII7.html?sort=new&p=%s";
+//        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Thuc-Te/IWZ9ZIIU.html?sort=new&p=%s";
+        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Au-My/IWZ9ZII9.html?sort=new&p=%s";
+        for(int i=1;i<12;i++){
+            String tmpX = String.format(urlTemplateShow, i);
+            List<String> listLinkShow = getListLinkShow(tmpX);
+            if(listLinkShow!=null&&listLinkShow.size()>0){
+                for(String tmpLinkShow : listLinkShow){
+                    ZingTVShowEnt tmpVideoLinkEnt = getZingTVShowEnt(tmpLinkShow);
+                    if(tmpVideoLinkEnt!=null){
+                        CineChannelEnt tmpChannelEnt = new CineChannelEnt(tmpVideoLinkEnt);
+                        long tmpId = CineServiceUtils.CreateCineChanel(tmpChannelEnt);
+                        System.out.println("Id: "+ tmpId + " | " + tmpLinkShow);
+                    }
+                }
+            }
         }
         
         
-        urlShow = "http://tv.zing.vn/video/The-100-Season-2-Tap-2-Inclement-Weather/IWZACA8A.html";
-        ZingTVVideoEnt tmpVideo = getZingTVVideoEnt(urlShow);
-        if(tmpVideo!=null){
-            System.out.println("URL:"+urlShow+" => "+JSONUtil.Serialize(tmpVideo));
-        }
+        
+//        String urlShow = "http://tv.zing.vn/the-100-season-2";
+//        ZingTVShowEnt tmpVideoLinkEnt = getZingTVShowEnt(urlShow);
+//        if(tmpVideoLinkEnt!=null){
+//            System.out.println("URL:"+urlShow+" => "+JSONUtil.Serialize(tmpVideoLinkEnt));
+//            CineChannelEnt tmpChannelEnt = new CineChannelEnt(tmpVideoLinkEnt);
+//            long tmpId = CineServiceUtils.CreateCineChanel(tmpChannelEnt);
+//        }
+//        
+//        
+//        urlShow = "http://tv.zing.vn/video/The-100-Season-2-Tap-2-Inclement-Weather/IWZACA8A.html";
+//        ZingTVVideoEnt tmpVideo = getZingTVVideoEnt(urlShow);
+//        if(tmpVideo!=null){
+//            System.out.println("URL:"+urlShow+" => "+JSONUtil.Serialize(tmpVideo));
+//        }
     }
     
     
-    
+    public static List<String> getListLinkShow(String showPageLink) {
+        List<String> listReturn = new ArrayList<String>();
+        try {
+            Document doc = Jsoup.connect(showPageLink)
+                        .userAgent("Mozilla/5.0 (Windows NT 6.1; rv:14.0) Gecko/20100101 Firefox/14.0.1")
+                        .header("charset", "UTF-8")
+                        .timeout(600000)
+                        .get();
+            Elements elementShow = doc.select("div.item");
+            if(elementShow!=null&&elementShow.size()>0){
+                for(Element tmpShow : elementShow){
+                    String tmpLink = tmpShow.select("a.thumb").attr("href");
+                    if(!commonUtils.CommonUtils.IsNullOrEmpty(tmpLink)){
+                        listReturn.add("http://tv.zing.vn"+tmpLink);
+                    }
+                }
+                return listReturn;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return null;
+    } 
     
     public static ZingTVShowEnt getZingTVShowEnt(String showLink) {
         try {
@@ -58,7 +102,7 @@ public class ZingTV {
             if(elementGenres!=null&&elementGenres.size()>0){
                 for(Element tmpGenres : elementGenres){
                     if(tmpGenres!=null){
-                        showGenres.add(tmpGenres.html());
+                        showGenres.add(tmpGenres.text());
                     }
                 }
             }
