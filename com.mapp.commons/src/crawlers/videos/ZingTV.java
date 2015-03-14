@@ -5,6 +5,7 @@
  */
 package crawlers.videos;
 
+import com.nct.framework.util.ConvertUtils;
 import com.nct.framework.util.JSONUtil;
 import commonUtils.CommonUtils;
 import databaseUtils.CineServiceUtils;
@@ -28,10 +29,28 @@ import org.jsoup.select.Elements;
 public class ZingTV {
     
     public static void main(String[] args) { 
+//        List<SeasonEnt> lstSeasonTest = getListSeasonEnt(6, "http://tv.zing.vn/cau-chuyen-cafe");
+//        System.out.println(JSONUtil.Serialize(lstSeasonTest));
+//        System.exit(0);
+//        
         
-        List<SeasonEnt> lstSeason = getListSeasonEnt(125, "http://tv.zing.vn/ngoi-sao-viet-2014");
-        System.out.println(JSONUtil.Serialize(lstSeason));
+        List<CineChannelEnt> listChannels = CineServiceUtils.GetListChannels(CineChannelEnt.STATUS.ENABLE);
+        if(listChannels!=null&&listChannels.size()>0){
+            for(CineChannelEnt tmpChannel : listChannels){
+                if(tmpChannel!=null&&!CommonUtils.IsNullOrEmpty(tmpChannel.Source)){
+                    List<SeasonEnt> lstSeason = getListSeasonEnt(tmpChannel.Id, tmpChannel.Source);
+                    if(lstSeason!=null&&lstSeason.size()>0){
+//                        CineServiceUtils.InsertSeasonEnt(lstSeason);
+                        
+                        for(SeasonEnt tmpSeason : lstSeason){
+                            CineServiceUtils.CreateSeason(tmpSeason);
+                        }
+                    }
+                }
+            }
+        }
         
+        System.exit(0);
         
         
 //        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Viet-Nam/IWZ9ZII7.html?sort=new&p=%s";
@@ -213,9 +232,18 @@ public class ZingTV {
                 for(Element tmpSeason : elementSeason){
                     SeasonEnt tmpSeasonEnt = new SeasonEnt();
                     tmpSeasonEnt.ChannelId = channelId;
-                    tmpSeasonEnt.Name = tmpSeason.select("div.title-bar").select("h3>a").text();
-                    tmpSeasonEnt.Source = "http://tv.zing.vn"+tmpSeason.select("div.title-bar").select("h3>a").attr("href");
-                    tmpSeasonEnt.Status = 0;
+                    String seasonTitle = tmpSeason.select("div.title-bar").select("h3>a").text();
+                    String seasonSource = "http://tv.zing.vn"+tmpSeason.select("div.title-bar").select("h3>a").attr("href");
+                    if(CommonUtils.IsNullOrEmpty(seasonTitle)){
+                        seasonTitle = tmpSeason.select("div.title-bar").select("h3").text();
+                        seasonSource = "";
+                    }
+                    tmpSeasonEnt.Name = seasonTitle;
+                    tmpSeasonEnt.Source = seasonSource;
+                    String strNumVideo = (tmpSeason.select("div.title-bar").select("div.see-all").select("a").last()!=null)?tmpSeason.select("div.title-bar").select("div.see-all").select("a").last().text():"";
+                    
+                    int numVideo = CommonUtils.IsNullOrEmpty(strNumVideo)? 0 : ConvertUtils.toInt(strNumVideo.replaceAll("\\)", "").replaceAll("Xem tất cả \\(", ""));
+                    tmpSeasonEnt.Status = SeasonEnt.STATUS.FULL;
                     
                     Elements elementVideo = tmpSeason.select("div.flex-des");
                     if(elementVideo!=null&&elementVideo.size()>0){
@@ -230,6 +258,9 @@ public class ZingTV {
                             
                             tmpSeasonEnt.ListVideos.add(tmpVideoEnt);
                         }
+                    }
+                    if(numVideo>0&&numVideo>tmpSeasonEnt.ListVideos.size()){
+                        tmpSeasonEnt.Status = SeasonEnt.STATUS.ENABLE;
                     }
                     listReturn.add(tmpSeasonEnt);
                 }

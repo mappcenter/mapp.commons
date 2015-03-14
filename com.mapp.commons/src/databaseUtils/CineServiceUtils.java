@@ -9,13 +9,19 @@ import com.nct.framework.common.LogUtil;
 import com.nct.framework.dbconn.ClientManager;
 import com.nct.framework.dbconn.ManagerIF;
 import com.nct.framework.util.ConvertUtils;
+import commonUtils.MyPrepareStatement;
 import entities.CategoryEnt;
+import entities.DB.AppImageEnt;
 import entities.DB.CineChannelEnt;
+import entities.SeasonEnt;
+import entities.VideoEnt;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -49,7 +55,7 @@ public class CineServiceUtils {
             
             PreparedStatement stmt = cnn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, channelEnt.Name);
-            stmt.setString(2, channelEnt.Thumb);
+            stmt.setString(2, channelEnt.Image);
             stmt.setString(3, channelEnt.Cover);
             stmt.setString(4, StringUtils.join(channelEnt.Categories, ","));
             stmt.setString(5, channelEnt.Description);
@@ -101,7 +107,40 @@ public class CineServiceUtils {
         return categoryReturn;
     }
 
-
+    public static List<CineChannelEnt> GetListChannels(int channelStatus) {
+        List<CineChannelEnt> listReturn = new ArrayList<CineChannelEnt>();
+        ManagerIF cm = ClientManager.getInstance("hdbox_server_db");
+        Connection cnn = cm.borrowClient();
+     
+        try {
+            String query = "SELECT * FROM `Cine_Channel` WHERE `Status` = ? ;";
+            PreparedStatement stmt = cnn.prepareStatement(query);
+            stmt.setInt(1, channelStatus);
+            ResultSet resultSet = stmt.executeQuery();
+            while (resultSet.next()) {
+                CineChannelEnt tmpCineChannelEnt = new CineChannelEnt();
+                tmpCineChannelEnt.Id = ConvertUtils.toLong(resultSet.getString("Id"));
+                tmpCineChannelEnt.Name = ConvertUtils.toString(resultSet.getString("Name"));
+                tmpCineChannelEnt.Image = ConvertUtils.toString(resultSet.getString("Image"));
+                tmpCineChannelEnt.Cover = ConvertUtils.toString(resultSet.getString("Cover"));
+                tmpCineChannelEnt.Description = ConvertUtils.toString(resultSet.getString("Description"));
+                tmpCineChannelEnt.Country = ConvertUtils.toString(resultSet.getString("Country"));
+                tmpCineChannelEnt.Time = ConvertUtils.toString(resultSet.getString("Time"));
+                tmpCineChannelEnt.Categories = new ArrayList<Long>();
+                tmpCineChannelEnt.Tags = new ArrayList<String>();
+                tmpCineChannelEnt.ArtistIds = new ArrayList<Long>();
+                tmpCineChannelEnt.Status = ConvertUtils.toInt(resultSet.getString("Status"));
+                tmpCineChannelEnt.Source = ConvertUtils.toString(resultSet.getString("Source"));
+                
+                listReturn.add(tmpCineChannelEnt);
+            }
+        }catch (SQLException ex) {
+            logger.error(LogUtil.stackTrace(ex));
+        } finally {
+            cm.returnClient(cnn);
+        }
+        return listReturn;
+    }
 
 
     public static long CreateCategory(CategoryEnt categoryEnt) {
@@ -128,8 +167,116 @@ public class CineServiceUtils {
             cm.returnClient(cnn);
         }
         return categoryReturn;
-  }
+    }
 
+    public static long CreateSeason(SeasonEnt seasonEnt) {
+        long categoryReturn = 0L;
+        ManagerIF cm = ClientManager.getInstance("hdbox_server_db");
+        Connection cnn = cm.borrowClient();
+        try {
+            String query = "INSERT INTO `Cine_Season` (`Name`, `ChannelId`, `Source`, `Status`) VALUE(?,?,?,?) ;";
+            PreparedStatement stmt = cnn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            stmt.setString(1, seasonEnt.Name);
+            stmt.setLong(2, seasonEnt.ChannelId);
+            stmt.setString(3, seasonEnt.Source);
+            stmt.setInt(4, seasonEnt.Status);
+
+            int result = stmt.executeUpdate();
+            if (result > 0) {
+                ResultSet generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next())
+                    categoryReturn = generatedKeys.getLong(1);
+            }
+            
+            if(categoryReturn>0&&seasonEnt.ListVideos!=null&&seasonEnt.ListVideos.size()>0&&seasonEnt.Status==SeasonEnt.STATUS.FULL){
+                CineServiceUtils.InsertVideoEnt(seasonEnt.ListVideos);
+            }
+        }catch (SQLException ex){
+            logger.error(LogUtil.stackTrace(ex));
+        } finally {
+            cm.returnClient(cnn);
+        }
+        return categoryReturn;
+    }
+
+    public static long InsertVideoEnt(List<VideoEnt> listVideoEnt) {
+        long categoryReturn = 0L;
+        ManagerIF cm = ClientManager.getInstance("hdbox_server_db");
+        Connection cnn = cm.borrowClient();
+        try {
+            String query = "INSERT INTO `Cine_Video` (`Title`, `Image`, `SeasonId`, `Source`, `Status`)"
+                    + " VALUES %s";
+            
+            String valuesQuery = "";
+            MyPrepareStatement stmtValues = new MyPrepareStatement("(?,?,?,?,?)");
+            for (VideoEnt tmpVideoEnt : listVideoEnt) {
+                stmtValues.setString(1, tmpVideoEnt.Title);
+                stmtValues.setString(2, tmpVideoEnt.Image);
+                stmtValues.setLong(3, tmpVideoEnt.SeasonId);
+                stmtValues.setString(4, tmpVideoEnt.Source);
+                stmtValues.setInt(5, tmpVideoEnt.Status);
+                valuesQuery += stmtValues.toString() + ",";
+            }
+            while (valuesQuery.endsWith(",")) {
+                valuesQuery = valuesQuery.substring(0, valuesQuery.lastIndexOf(","));
+            }
+            PreparedStatement stmt = cnn.prepareStatement(String.format(query, valuesQuery), Statement.RETURN_GENERATED_KEYS);
+            
+            int result = stmt.executeUpdate();
+            if(result>0){
+                ResultSet tableKeys = stmt.getGeneratedKeys();
+                if(tableKeys.next()){
+                    long autoGeneratedID = tableKeys.getLong(1);
+                    categoryReturn = (autoGeneratedID>0) ? autoGeneratedID : 0;
+                }
+            }
+        } catch (SQLException ex){
+            logger.error(LogUtil.stackTrace(ex));
+        } finally {
+            cm.returnClient(cnn);
+        }
+        
+        return categoryReturn;
+   }
+    
+    public static long InsertSeasonEnt(List<SeasonEnt> listSeasonEnt) {
+        long categoryReturn = 0L;
+        ManagerIF cm = ClientManager.getInstance("hdbox_server_db");
+        Connection cnn = cm.borrowClient();
+        try {
+            String query = "INSERT INTO `Cine_Season` (`Name`, `ChannelId`, `Source`, `Status`)"
+                    + " VALUES %s";
+            
+            String valuesQuery = "";
+            MyPrepareStatement stmtValues = new MyPrepareStatement("(?,?,?,?)");
+            for (SeasonEnt tmpSeasonEnt : listSeasonEnt) {
+                stmtValues.setString(1, tmpSeasonEnt.Name);
+                stmtValues.setLong(2, tmpSeasonEnt.ChannelId);
+                stmtValues.setString(3, tmpSeasonEnt.Source);
+                stmtValues.setInt(4, tmpSeasonEnt.Status);
+                valuesQuery += stmtValues.toString() + ",";
+            }
+            while (valuesQuery.endsWith(",")) {
+                valuesQuery = valuesQuery.substring(0, valuesQuery.lastIndexOf(","));
+            }
+            PreparedStatement stmt = cnn.prepareStatement(String.format(query, valuesQuery), Statement.RETURN_GENERATED_KEYS);
+            
+            int result = stmt.executeUpdate();
+            if(result>0){
+                ResultSet tableKeys = stmt.getGeneratedKeys();
+                if(tableKeys.next()){
+                    long autoGeneratedID = tableKeys.getLong(1);
+                    categoryReturn = (autoGeneratedID>0) ? autoGeneratedID : 0;
+                }
+            }
+        } catch (SQLException ex){
+            logger.error(LogUtil.stackTrace(ex));
+        } finally {
+            cm.returnClient(cnn);
+        }
+        
+        return categoryReturn;
+   }
 
 
 }

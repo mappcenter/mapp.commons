@@ -18,4 +18,11 @@ public class SeasonEnt {
     public String Source;
     public int Status;
     public List<VideoEnt> ListVideos;
+    
+    public class STATUS {
+        public static final int ENABLE = 1;
+        public static final int DISABLE = 2;
+        public static final int DELETED = 3;
+        public static final int FULL = 4;
+    }
 }

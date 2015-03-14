@@ -18,7 +18,7 @@ import serviceUtils.CategoryServiceUtils;
 public class CineChannelEnt {
     public long Id;
     public String Name;
-    public String Thumb;
+    public String Image;
     public String Cover;
     public String Description;
     public String Country;
@@ -35,11 +35,28 @@ public class CineChannelEnt {
         public static final int DELETED = 3;
     }
     
+    
+    public CineChannelEnt(){
+        this.Id = 0;
+        this.Name = "";
+        this.Image = "";
+        this.Cover = "";
+        this.Description = "";
+        this.Country = "";
+        this.Time = "";
+        this.Categories = new ArrayList<Long>();
+        this.Tags = new ArrayList<String>();
+        this.ArtistIds = new ArrayList<Long>();
+        this.Status = CineChannelEnt.STATUS.ENABLE;
+        this.Source = "";
+        
+    }
+    
     public CineChannelEnt(ZingTVShowEnt zingTVShowEnt, long parentId, String parentName) {
         if(zingTVShowEnt!=null){            
             this.Id = 0;
             this.Name = StringEscapeUtils.unescapeHtml(zingTVShowEnt.Title);
-            this.Thumb = zingTVShowEnt.Image;
+            this.Image = zingTVShowEnt.Image;
             this.Cover = zingTVShowEnt.Cover;
             this.Description = StringEscapeUtils.unescapeHtml(zingTVShowEnt.Description);
             this.Country = StringEscapeUtils.unescapeHtml(zingTVShowEnt.QuocGia);
