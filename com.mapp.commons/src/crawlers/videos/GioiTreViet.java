@@ -57,7 +57,35 @@ public class GioiTreViet {
         }
         
     }
-    
+    public static String getVideoMain() {
+        String urlX = "http://gioitreviet.net/video/page/%s/";
+        String dateFiles = "";
+        
+        try {
+            
+            for(int i=0;i<50;i++){
+                String tmpX = String.format(urlX, i);
+                List<VideoLinkEnt> tmpVideoLinkEnt = getVideoLinkEnt(tmpX);
+                if(tmpVideoLinkEnt!=null){
+                    for(VideoLinkEnt xVideo : tmpVideoLinkEnt){
+                        dateFiles += xVideo.Link+"--"+xVideo.Title+"\n";
+                    }
+                    System.out.println("Id:"+i+" => "+JSONUtil.Serialize(tmpVideoLinkEnt));
+                }
+            }
+            //Write to Files
+            File file = new File(filePath); 
+            if(file.delete()){
+                    System.out.println(file.getName() + " is deleted!");
+            }else{
+                    System.out.println("Delete operation is failed.");
+            }
+            files.FileUtils.WriteDatFile(filePath, dateFiles);
+        } catch (Exception e) {
+            logger.error(LogUtil.stackTrace(e));
+        }
+        return dateFiles;
+    }
     
     public static List<VideoLinkEnt> getVideoLinkEnt(String videoLink) {
         try {

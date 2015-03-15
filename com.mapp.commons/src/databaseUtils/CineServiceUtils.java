@@ -170,7 +170,7 @@ public class CineServiceUtils {
     }
 
     public static long CreateSeason(SeasonEnt seasonEnt) {
-        long categoryReturn = 0L;
+        long idReturn = 0L;
         ManagerIF cm = ClientManager.getInstance("hdbox_server_db");
         Connection cnn = cm.borrowClient();
         try {
@@ -185,21 +185,21 @@ public class CineServiceUtils {
             if (result > 0) {
                 ResultSet generatedKeys = stmt.getGeneratedKeys();
                 if (generatedKeys.next())
-                    categoryReturn = generatedKeys.getLong(1);
+                    idReturn = generatedKeys.getLong(1);
             }
             
-            if(categoryReturn>0&&seasonEnt.ListVideos!=null&&seasonEnt.ListVideos.size()>0&&seasonEnt.Status==SeasonEnt.STATUS.FULL){
-                CineServiceUtils.InsertVideoEnt(seasonEnt.ListVideos);
+            if(idReturn>0&&seasonEnt.ListVideos!=null&&seasonEnt.ListVideos.size()>0&&seasonEnt.Status==SeasonEnt.STATUS.FULL){
+                CineServiceUtils.InsertVideoEnt(idReturn, seasonEnt.ListVideos);
             }
         }catch (SQLException ex){
             logger.error(LogUtil.stackTrace(ex));
         } finally {
             cm.returnClient(cnn);
         }
-        return categoryReturn;
+        return idReturn;
     }
 
-    public static long InsertVideoEnt(List<VideoEnt> listVideoEnt) {
+    public static long InsertVideoEnt(long seasonId, List<VideoEnt> listVideoEnt) {
         long categoryReturn = 0L;
         ManagerIF cm = ClientManager.getInstance("hdbox_server_db");
         Connection cnn = cm.borrowClient();
@@ -210,6 +210,8 @@ public class CineServiceUtils {
             String valuesQuery = "";
             MyPrepareStatement stmtValues = new MyPrepareStatement("(?,?,?,?,?)");
             for (VideoEnt tmpVideoEnt : listVideoEnt) {
+                tmpVideoEnt.SeasonId = seasonId;
+                
                 stmtValues.setString(1, tmpVideoEnt.Title);
                 stmtValues.setString(2, tmpVideoEnt.Image);
                 stmtValues.setLong(3, tmpVideoEnt.SeasonId);

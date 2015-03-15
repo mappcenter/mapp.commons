@@ -39,6 +39,7 @@ public class ZingTV {
             for(CineChannelEnt tmpChannel : listChannels){
                 if(tmpChannel!=null&&!CommonUtils.IsNullOrEmpty(tmpChannel.Source)){
                     List<SeasonEnt> lstSeason = getListSeasonEnt(tmpChannel.Id, tmpChannel.Source);
+                    System.out.println("["+tmpChannel.Id+"]"+tmpChannel.Name+"|"+tmpChannel.Source);
                     if(lstSeason!=null&&lstSeason.size()>0){
 //                        CineServiceUtils.InsertSeasonEnt(lstSeason);
                         
@@ -48,8 +49,8 @@ public class ZingTV {
                     }
                 }
             }
-        }
-        
+        }    
+        System.out.println("FINISH ................");
         System.exit(0);
         
         
