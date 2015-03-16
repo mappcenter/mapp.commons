@@ -57,6 +57,7 @@ public class GioiTreViet {
         }
         
     }
+    
     public static String getVideoMain() {
         String urlX = "http://gioitreviet.net/video/page/%s/";
         String dateFiles = "";

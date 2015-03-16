@@ -25,7 +25,7 @@ public class CategoryServiceUtils {
         }
         for (String tmpCategory : categories) {
           if (!CommonUtils.IsNullOrEmpty(tmpCategory)) {
-            long tmpCategoryId = CineServiceUtils.CheckExistName(tmpCategory);
+            long tmpCategoryId = CineServiceUtils.CheckExistNameWithParent(catParentId, tmpCategory);
             if (tmpCategoryId > 0) {
                 result.add(tmpCategoryId);
             } else {

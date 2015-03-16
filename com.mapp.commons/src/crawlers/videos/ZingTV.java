@@ -34,31 +34,33 @@ public class ZingTV {
 //        System.exit(0);
 //        
         
-        List<CineChannelEnt> listChannels = CineServiceUtils.GetListChannels(CineChannelEnt.STATUS.ENABLE);
-        if(listChannels!=null&&listChannels.size()>0){
-            for(CineChannelEnt tmpChannel : listChannels){
-                if(tmpChannel!=null&&!CommonUtils.IsNullOrEmpty(tmpChannel.Source)){
-                    List<SeasonEnt> lstSeason = getListSeasonEnt(tmpChannel.Id, tmpChannel.Source);
-                    System.out.println("["+tmpChannel.Id+"]"+tmpChannel.Name+"|"+tmpChannel.Source);
-                    if(lstSeason!=null&&lstSeason.size()>0){
-//                        CineServiceUtils.InsertSeasonEnt(lstSeason);
-                        
-                        for(SeasonEnt tmpSeason : lstSeason){
-                            CineServiceUtils.CreateSeason(tmpSeason);
-                        }
-                    }
-                }
-            }
-        }    
-        System.out.println("FINISH ................");
-        System.exit(0);
+//        List<CineChannelEnt> listChannels = CineServiceUtils.GetListChannels(CineChannelEnt.STATUS.ENABLE);
+//        if(listChannels!=null&&listChannels.size()>0){
+//            for(CineChannelEnt tmpChannel : listChannels){
+//                if(tmpChannel!=null&&!CommonUtils.IsNullOrEmpty(tmpChannel.Source)){
+//                    List<SeasonEnt> lstSeason = getListSeasonEnt(tmpChannel.Id, tmpChannel.Source);
+//                    System.out.println("["+tmpChannel.Id+"]"+tmpChannel.Name+"|"+tmpChannel.Source);
+//                    if(lstSeason!=null&&lstSeason.size()>0){
+////                        CineServiceUtils.InsertSeasonEnt(lstSeason);
+//                        
+//                        for(SeasonEnt tmpSeason : lstSeason){
+//                            CineServiceUtils.CreateSeason(tmpSeason);
+//                        }
+//                    }
+//                }
+//            }
+//        }    
+//        System.out.println("FINISH ................");
+//        System.exit(0);
         
         
 //        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Viet-Nam/IWZ9ZII7.html?sort=new&p=%s";
 //        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Au-My/IWZ9ZII9.html?sort=new&p=%s";
-        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Thuc-Te/IWZ9ZIIU.html?sort=new&p=%s";
-        long categoryParentId = 3;
-        String categoryParentName = "TV Show";
+//        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Thuc-Te/IWZ9ZIIU.html?sort=new&p=%s";
+        
+        String urlTemplateShow = "http://tv.zing.vn/the-loai/Anime/IWZ9ZII0.html?sort=new&p=%s";
+        long categoryParentId = 1;
+        String categoryParentName = "Anime";
         for(int i=1;i<12;i++){
             String tmpX = String.format(urlTemplateShow, i);
             List<String> listLinkShow = getListLinkShow(tmpX);

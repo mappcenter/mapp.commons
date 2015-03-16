@@ -78,6 +78,52 @@ public class Hai24h_TV {
         
     }
     
+    public static String getVideoMain() {
+        String urlHot = "http://hai24h.tv/categories/video-hot/page/%s/";
+        String urlNew = "http://hai24h.tv/categories/video-moi-2/page/%s/";
+        String dateFiles = "";
+        
+        try {
+            //For HOT
+            for(int i=1;i<10;i++){
+                String tmpX = String.format(urlHot, i);
+                List<VideoLinkEnt> tmpVideoLinkEnt = getListVideoLinkEnt(tmpX);
+                if(tmpVideoLinkEnt!=null){
+                    for(VideoLinkEnt xVideo : tmpVideoLinkEnt){
+                        if(xVideo!=null){
+                            dateFiles += xVideo.Link+"--"+xVideo.Title+"\n";
+                        }
+                    }
+                    System.out.println("Id:"+i+" => "+JSONUtil.Serialize(tmpVideoLinkEnt));
+                }
+            }
+            //For New
+            for(int i=1;i<10;i++){
+                String tmpX = String.format(urlNew, i);
+                List<VideoLinkEnt> tmpVideoLinkEnt = getListVideoLinkEnt(tmpX);
+                if(tmpVideoLinkEnt!=null){
+                    for(VideoLinkEnt xVideo : tmpVideoLinkEnt){
+                        if(xVideo!=null){
+                            dateFiles += xVideo.Link+"--"+xVideo.Title+"\n";
+                        }
+                    }
+                    System.out.println("Id:"+i+" => "+JSONUtil.Serialize(tmpVideoLinkEnt));
+                }
+            }
+            //Write to Files
+            File file = new File(filePath); 
+            if(file.delete()){
+                    System.out.println(file.getName() + " is deleted!");
+            }else{
+                    System.out.println("Delete operation is failed.");
+            }
+            files.FileUtils.WriteDatFile(filePath, dateFiles);
+        } catch (Exception e) {
+            logger.error(LogUtil.stackTrace(e));
+        }
+        return dateFiles;
+    }
+    
     
      public static List<VideoLinkEnt> getListVideoLinkEnt(String videoLink) {
         try {

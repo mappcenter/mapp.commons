@@ -26,8 +26,20 @@ public class ARunTotal {
             String dateFiles = "";
             
             //Get Video
+            //GioiTreViet
             dateFiles += GioiTreViet.getVideoMain();
-            
+            //ChatVL
+            dateFiles += ChatVL.getVideoMain();
+            //BaoPhuNu360_Com
+            dateFiles += BaoPhuNu360_Com.getVideoMain();
+            //CuoiXL
+            dateFiles += CuoiXL.getVideoMain();
+            //Hai24h_TV
+            dateFiles += Hai24h_TV.getVideoMain();
+//            //Kenh101_Vn
+//            dateFiles += Kenh101_Vn.getVideoMain();
+            //KenhTin360
+            dateFiles += KenhTin360.getVideoMain();
             
             //Write to Files
             File file = new File(filePath); 

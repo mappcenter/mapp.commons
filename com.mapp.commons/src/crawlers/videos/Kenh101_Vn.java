@@ -65,6 +65,38 @@ public class Kenh101_Vn {
         
     }
     
+    public static String getVideoMain() {
+        String urlHot = "http://xabuon.com/home/%s";//0->15->30
+        String dateFiles = "";
+        
+        try {
+            //For Home
+            for(int i=0;i<20;i++){
+                String tmpX = String.format(urlHot, (i*15));
+                List<VideoLinkEnt> tmpVideoLinkEnt = getVideoLinkEnt(tmpX);
+                if(tmpVideoLinkEnt!=null){
+                    for(VideoLinkEnt xVideo : tmpVideoLinkEnt){
+                        if(xVideo!=null){
+                            dateFiles += xVideo.Link+"--"+xVideo.Title+"\n";
+                        }
+                    }
+                    System.out.println("Id:"+i+" => "+JSONUtil.Serialize(tmpVideoLinkEnt));
+                }
+            }
+            //Write to Files
+            File file = new File(filePath); 
+            if(file.delete()){
+                    System.out.println(file.getName() + " is deleted!");
+            }else{
+                    System.out.println("Delete operation is failed.");
+            }
+            files.FileUtils.WriteDatFile(filePath, dateFiles);
+        } catch (Exception e) {
+            logger.error(LogUtil.stackTrace(e));
+        }
+        return dateFiles;
+    }
+    
     public static List<VideoLinkEnt> getVideoLinkEnt(String videoLink) {
         try {
             List<VideoLinkEnt> listResult = new ArrayList<VideoLinkEnt>();

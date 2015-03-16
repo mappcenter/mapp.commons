@@ -106,6 +106,30 @@ public class CineServiceUtils {
         }
         return categoryReturn;
     }
+    
+    public static long CheckExistNameWithParent(long parentId, String categoryName) {
+        long categoryReturn = 0L;
+        ManagerIF cm = ClientManager.getInstance("hdbox_server_db");
+        Connection cnn = cm.borrowClient();
+     
+        try {
+            String query = "SELECT * FROM `Cine_Category` WHERE `Parent`=? AND `Name` = ? ;";
+            PreparedStatement stmt = cnn.prepareStatement(query);
+            stmt.setLong(1, parentId);
+            stmt.setString(2, categoryName);
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                long tmpId = ConvertUtils.toLong(resultSet.getString("Id"));
+                if (tmpId > 0L)
+                    categoryReturn = tmpId;
+            }
+        }catch (SQLException ex) {
+            logger.error(LogUtil.stackTrace(ex));
+        } finally {
+            cm.returnClient(cnn);
+        }
+        return categoryReturn;
+    }
 
     public static List<CineChannelEnt> GetListChannels(int channelStatus) {
         List<CineChannelEnt> listReturn = new ArrayList<CineChannelEnt>();
