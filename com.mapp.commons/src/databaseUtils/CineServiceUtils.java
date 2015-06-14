@@ -11,7 +11,6 @@ import com.nct.framework.dbconn.ManagerIF;
 import com.nct.framework.util.ConvertUtils;
 import commonUtils.MyPrepareStatement;
 import entities.CategoryEnt;
-import entities.DB.AppImageEnt;
 import entities.DB.CineChannelEnt;
 import entities.SeasonEnt;
 import entities.VideoEnt;
