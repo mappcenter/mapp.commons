@@ -54,13 +54,13 @@ public class ZingTV {
 //        System.exit(0);
         
         
-//        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Viet-Nam/IWZ9ZII7.html?sort=new&p=%s";
+        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Viet-Nam/IWZ9ZII7.html?sort=new&p=%s";
 //        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Au-My/IWZ9ZII9.html?sort=new&p=%s";
 //        String urlTemplateShow = "http://tv.zing.vn/the-loai/Show-Thuc-Te/IWZ9ZIIU.html?sort=new&p=%s";
         
-        String urlTemplateShow = "http://tv.zing.vn/the-loai/Anime/IWZ9ZII0.html?sort=new&p=%s";
+//        String urlTemplateShow = "http://tv.zing.vn/the-loai/Anime/IWZ9ZII0.html?sort=new&p=%s";
         long categoryParentId = 1;
-        String categoryParentName = "Anime";
+        String categoryParentName = "TV Show";
         for(int i=1;i<12;i++){
             String tmpX = String.format(urlTemplateShow, i);
             List<String> listLinkShow = getListLinkShow(tmpX);
