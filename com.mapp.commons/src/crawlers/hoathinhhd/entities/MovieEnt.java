@@ -54,7 +54,7 @@ public class MovieEnt {
         
     }
     
-    public MovieEnt(ZingTVShowEnt zingTVShowEnt, long parentId, String parentName) {
+    public MovieEnt(ZingTVShowEnt zingTVShowEnt) {
         if(zingTVShowEnt!=null){            
             this.Id = 0;
             this.Name = StringEscapeUtils.unescapeHtml(zingTVShowEnt.Title);
@@ -63,7 +63,7 @@ public class MovieEnt {
             this.Description = StringEscapeUtils.unescapeHtml(zingTVShowEnt.Description);
             this.Country = StringEscapeUtils.unescapeHtml(zingTVShowEnt.QuocGia);
             this.Time = "";
-            this.Categories = getListCategoryIds(zingTVShowEnt.Genres, "HoatHinhHD", parentId, parentName);
+            this.Categories = getListCategoryIds(zingTVShowEnt.Genres, "HoatHinhHD");
             
             this.Tags = zingTVShowEnt.Tags;
 //            this.ArtistIds = zingTVShowEnt.Artist;
@@ -74,22 +74,22 @@ public class MovieEnt {
         }
     }
     
-    public static List<Long> getListCategoryIds(List<String> categories, String catModule, long catParentId, String catParentName) {
+    public static List<Long> getListCategoryIds(List<String> categories, String catModule) {
         List result = new ArrayList();
         if ((categories == null) || (categories.isEmpty())) {
             return result;
         }
         for (String tmpCategory : categories) {
           if (!CommonUtils.IsNullOrEmpty(tmpCategory)) {
-            long tmpCategoryId = HoatHinhServiceUtils.CheckExistNameWithParent(catParentId, tmpCategory);
+            long tmpCategoryId = HoatHinhServiceUtils.CheckExistNameWithParent(0, tmpCategory);
             if (tmpCategoryId > 0) {
                 result.add(tmpCategoryId);
             } else {
                 CategoryEnt tmpCategoryEnt = new CategoryEnt();
                 tmpCategoryEnt.Module = catModule;
                 tmpCategoryEnt.Name = tmpCategory;
-                tmpCategoryEnt.Parent = catParentId;
-                tmpCategoryEnt.Tree = catParentName+">"+tmpCategory;
+                tmpCategoryEnt.Parent = 0;
+                tmpCategoryEnt.Tree = tmpCategory;
                 tmpCategoryId = HoatHinhServiceUtils.CreateCategory(tmpCategoryEnt);
                 if (tmpCategoryId > 0) {
                   result.add(tmpCategoryId);

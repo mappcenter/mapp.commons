@@ -8,10 +8,10 @@ package crawlers.hoathinhhd;
 import commonUtils.CommonUtils;
 import crawlers.hoathinhhd.entities.MovieEnt;
 import databaseUtils.HoatHinhServiceUtils;
-import entities.DB.CineChannelEnt;
 import entities.crawlEnt.ZingTVShowEnt;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -48,8 +48,6 @@ public class TVZing_Vn_App {
     public static void main(String[] args) {
         String urlTemplateShow = "http://tv.zing.vn/the-loai/Anime/IWZ9ZII0.html?sort=new&p=%s";
         urlTemplateShow = "http://tv.zing.vn/the-loai/Hanh-Dong-Phieu-Luu/IWZ9ZI0B.html?sort=new&p=%s";
-        long categoryParentId = 16;
-        String categoryParentName = "Hành Động - Phiêu Lưu";
         for(int i=1;i<12;i++){
             String tmpX = String.format(urlTemplateShow, i);
             List<String> listLinkShow = getListLinkShow(tmpX);
@@ -57,7 +55,7 @@ public class TVZing_Vn_App {
                 for(String tmpLinkShow : listLinkShow){
                     ZingTVShowEnt tmpVideoLinkEnt = getZingTVShowEnt(tmpLinkShow);
                     if(tmpVideoLinkEnt!=null){
-                        MovieEnt tmpChannelEnt = new MovieEnt(tmpVideoLinkEnt, categoryParentId, categoryParentName);
+                        MovieEnt tmpChannelEnt = new MovieEnt(tmpVideoLinkEnt);
                         long tmpId = HoatHinhServiceUtils.CreateMovie(tmpChannelEnt);
                         System.out.println("Id: "+ tmpId + " | " + tmpLinkShow);
                     }
@@ -106,7 +104,13 @@ public class TVZing_Vn_App {
             if(elementGenres!=null&&elementGenres.size()>0){
                 for(Element tmpGenres : elementGenres){
                     if(tmpGenres!=null){
-                        showGenres.add(tmpGenres.text());
+                        String[] lstKey = StringUtils.split(tmpGenres.text(), "-");
+                        if(lstKey!=null&&lstKey.length>0){
+                            for(String tmpKeyGenre : lstKey){
+                                showGenres.add(tmpKeyGenre.trim());
+                            }
+                        }
+                        
                     }
                 }
             }
