@@ -51,6 +51,7 @@ public class CuoiXL {
             }else{
                     System.out.println("Delete operation is failed.");
             }
+            System.out.println("Save File : "+filePath);
             files.FileUtils.WriteDatFile(filePath, dateFiles);
         } catch (Exception e) {
             logger.error(LogUtil.stackTrace(e));

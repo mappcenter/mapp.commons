@@ -6,6 +6,7 @@ import domains.domainUtils;
 import entities.TestEnt;
 import java.util.ArrayList;
 import java.util.List;
+import serviceUtils.FileCacheUtils;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -23,6 +24,12 @@ public class RunLocal {
     private static final int K = 100;
         
     public static void main(String[] args) {
+        boolean setRes = FileCacheUtils.setCacheFile("home.1.IOS", "tao lao bi dao");
+        System.out.println(setRes);
+        String setResult = FileCacheUtils.getMemcache("home.1.IOS");
+        System.out.println(setResult);
+        System.exit(0);
+        
         System.out.println("Hello!");
         String lstDomain = "";
         List<String> listDomains = CommonUtils.ParseStringToListString(lstDomain);
