@@ -11,14 +11,21 @@ import com.nct.framework.util.JSONUtil;
 import commonUtils.ResultCode;
 import config.ConfigInfo;
 import entities.HoatHinhHD.AdvEnt;
+import entities.HoatHinhHD.CategoryEnt;
+import entities.HoatHinhHD.HomeEnt;
 import entities.HoatHinhHD.RelateApp;
+import entities.HoatHinhHD.UpdateVersionEnt;
+import entities.HoatHinhHD.MovieEnt;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
+import serviceUtils.HoatHinhServiceUtils;
 
 /**
  *
@@ -46,17 +53,31 @@ public class HoatHinhHD_Controller extends HttpServlet {
         try {
             String action = request.getParameter("action");
             switch(action){
-                case "getversion":
-                    outputJson = "";
+                case "version":
+                    outputJson = String.format(jsonTemplateResult, ResultCode.SUCCESS_NO_MESSAGE, "", false, JSONUtil.Serialize(new  UpdateVersionEnt()));
                     break;
-                case "getcategory":
-                    outputJson = "";
+                case "category":
+                    List<CategoryEnt> listCategory = HoatHinhServiceUtils.GetListCategory();
+                    if(listCategory!=null&&listCategory.size()>0){
+                        outputJson = String.format(jsonTemplateResult, ResultCode.SUCCESS_NO_MESSAGE, "", false, JSONUtil.Serialize(listCategory));
+                    }else{
+                        outputJson = String.format(jsonTemplateResult, ResultCode.FAIL_NO_MESSAGE, "", false, JSONUtil.Serialize(""));
+                    }
                     break;
-                case "gethome":
-                    outputJson = "";
+                case "home":
+                    List<MovieEnt> listHomeMovie = HoatHinhServiceUtils.GetListMovie(1, 1, 20);
+                    HomeEnt homeEnt = new HomeEnt(null, listHomeMovie);
+                    outputJson = String.format(jsonTemplateResult, ResultCode.SUCCESS_NO_MESSAGE, "", false, JSONUtil.Serialize(homeEnt));
                     break;
                 case "getlistcontent":
-                    outputJson = "";
+                    long catId = ConvertUtils.toLong(request.getParameter("id"));
+                    int pageIndex = ConvertUtils.toInt(request.getParameter("page"));
+                    List<MovieEnt> listMovie = HoatHinhServiceUtils.GetListMovie(catId, pageIndex, 20);
+                    if(listMovie!=null&&listMovie.size()>0){
+                        outputJson = String.format(jsonTemplateResult, ResultCode.SUCCESS_NO_MESSAGE, "", false, JSONUtil.Serialize(listMovie));
+                    }else{
+                        outputJson = String.format(jsonTemplateResult, ResultCode.FAIL_NO_MESSAGE, "", false, JSONUtil.Serialize(""));
+                    }
                     break;
                 case "getitemdetail":
                     outputJson = "";
